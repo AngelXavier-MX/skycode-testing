@@ -1,44 +1,56 @@
-from locust import HttpUser, task, between, SequentialTaskSet, TaskSet
+from locust import HttpUser, between, SequentialTaskSet, task
+
 
 class UserBehavior(SequentialTaskSet):
-    @task
+
     def on_start(self):
+        """Login at the start of the test."""
         payload = {
             "mail_id": "divyasnpr02@gmail.com",
             "password": "Skylimit@123"
         }
         headers = {"Content-Type": "application/json"}
 
-        response = self.client.post("/api/login/", json=payload, headers=headers, name="login")
-        print(response.text)
-        print(response.status_code)
-        print(response.headers)
-        print(response.cookies)
+        response = self.client.post("/api/login/", json=payload, headers=headers, name="Login")
+        print("Login Response Text:", response.text)
+        print("Status Code:", response.status_code)
+        print("Response Headers:", response.headers)
+        print("Response Cookies:", response.cookies)
 
         if response.status_code == 200:
-            self.client.get("/custom_components/organizations/", name="organizations")
             try:
                 token = response.json().get("token")
                 if token:
                     self.client.headers.update({
                         "Authorization": f"Bearer {token}"
                     })
-                    print("Token set successfully in headers.")
+                    print(" Token set successfully in headers.")
                 else:
-                    print("No token found in login response.")
+                    print(" No token found in login response.")
             except Exception as e:
-                print("Error parsing token:", e)
+                print(" Error parsing token:", e)
         else:
-            print("Login failed. Check credentials or server status.")
+            print(" Login failed. Check credentials or server status.")
 
-    @task #no url like api/logout
+    @task
+    def get_organizations(self):
+        """Fetch list of organizations after login."""
+        response = self.client.get("/custom_components/organizations/", name="Get Organizations")
+        if response.status_code == 200:
+            orgs = response.json()
+            print("\nOrganizations List:")
+            for org in orgs:
+                print(f"- ID: {org['id']} | Name: {org['org_name']}")
+        else:
+            print(f" Failed to fetch organizations. Status: {response.status_code}")
+
     def on_stop(self):
-        # Optional: Log out or perform cleanup when user stops
-        try:
-            response = self.client.post("/api/logout/")
-            print("Logout response status:", response.status_code)
-        except Exception as e:
-            print("Error during logout:", e)
+        """Logout or cleanup (optional)."""
+        print(" Test stopped for user. No /api/logout/ endpoint found.")
+        # If your backend has a logout endpoint, use it here:
+        # response = self.client.post("/api/logout/")
+        # print("Logout Response:", response.status_code)
+
 
 class MyUser(HttpUser):
     wait_time = between(1, 3)
