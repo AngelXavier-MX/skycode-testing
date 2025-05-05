@@ -15,7 +15,7 @@ class FormCoreDataTasks(TaskSet):
             "form_description": "Attendance Process",
             "organization": 55,
             "permissions": [],
-            "form_style_schema": [],
+            "form_style_schma": [],
             "form_rule_schema": [],
             "core_table": False
         }
