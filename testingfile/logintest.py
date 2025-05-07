@@ -4,7 +4,7 @@ from locust import HttpUser, between, SequentialTaskSet, task
 class UserBehavior(SequentialTaskSet):
 
     def on_start(self):
-        """Login at the start of the test."""
+        """Login at the start of the test_files."""
         payload = {
             "mail_id": "divyasnpr02@gmail.com",
             "password": "Skylimit@123"

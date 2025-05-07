@@ -17,7 +17,7 @@ class FormCoreTasks(TaskSet):
                 print(f"Description: {form.get('form_description')}\n")
         else:
             print(f" Failed to fetch forms. Status Code: {response.status_code}")
-
+    #not working error bad url for method request
     # 2. Create a new form
     @task
     def create_form(self):
