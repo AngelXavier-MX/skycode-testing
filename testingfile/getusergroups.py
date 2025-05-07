@@ -1,43 +1,42 @@
 from locust import HttpUser, task, between, TaskSet
 
-class DashboardTasks(TaskSet):
-    organization_id = 55
 
+class RpaTasks(TaskSet):
+
+    # update user group
     @task
-    def create_dashboard(self):
-        dashboard_data = {
-
-                "name": "Finance Dashboard",
-                "usergroup": "182",
-                "dashboard_type": "client_dashboard_1",
-                "organization": 55,
-                "dashboard_config": {
-                    "cardOne": {
-                        "label": "Finance",
-                        "count": 10,
-                        "value": "Approved",
-                        "process_name": "finance_approval"
-                    }
-                }
-
-
+    def update_user_group(self):
+        group_id = 217  # Change this to the ID of the group you want to update
+        updated_data = {
+            "group_name": "monitor-updated",
+            "group_description": "Updated description for monitor group",
+            "status": True,
+            "organization": "55"
         }
 
         headers = {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            # "Authorization": "Bearer <your_token>"  # Uncomment and update if auth is required
         }
 
-        response = self.client.post(
-            "/custom_components/dashboards/55/",
-            json=dashboard_data,
+        response = self.client.patch(
+            f"/custom_components/organizations/55/usergroups/226/",
+            json=updated_data,
             headers=headers,
-            name="Create Dashboard"
+            name=f"Update Group {group_id}"
         )
-        print(f" Create Dashboard Status: {response.status_code}")
+
+        print(f" Updating Group ID {group_id}")
+        print(f"Status: {response.status_code}")
         print(f"Response: {response.text}")
 
+        if response.status_code in [200, 202]:
+            print(f" Successfully updated group {group_id}")
+        else:
+            print(f" Failed to update group {group_id}")
 
-class WebsiteUser(HttpUser):
+
+class MyUser(HttpUser):
     wait_time = between(1, 3)
     host = "http://13.235.34.196"
-    tasks = [DashboardTasks]
+    tasks = [RpaTasks]
